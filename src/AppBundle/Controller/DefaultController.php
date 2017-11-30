@@ -6,6 +6,7 @@ use AppBundle\Entity\User;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 class DefaultController extends Controller
 {
@@ -32,12 +33,22 @@ class DefaultController extends Controller
                 ->getRepository('AppBundle:User')
                 ->findOneBy(['name' => $name]);
             if (!$user instanceof User) {
-                throw new $this->createNotFoundException(
-                    'No user named ' . $name . ' found!'
-                );
+                throw new NotFoundHttpException('No user named ' . $name . ' found!');
             }
         }
 
         return $this->render('about/index.html.twig', ['user' => $user]);
+    }
+
+    /**
+     * @Route("/about/{name}/details", name="aboutpagemore")
+     */
+    public function detailsAction($name)
+    {
+        $user = $this->getDoctrine()
+            ->getRepository('AppBundle:User')
+            ->findOneBy(['name' => $name]);
+
+        return $this->render('about/more.html.twig', ['user' => $user]);
     }
 }
